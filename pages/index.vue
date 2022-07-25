@@ -2,11 +2,27 @@
   <div class="app">
     <main>
       <div>
-        <input type="text" />
+        <!-- <SearchInput 
+          :search-keyword="searchKeyword" 
+          @input="updateSearchKeyword"
+        /> -->
+        <SearchInput 
+          v-model="searchKeyword"
+          @search="searchProducts"
+        />
       </div>
       <ul>
-        <li class="item flex" v-for="product in products" :key="product.id">
-          <img class="product-image" :src="product.imageUrl" :alt="product.name" />
+        <li 
+          v-for="product in products" 
+          :key="product.id"
+          class="item flex"
+          @click="moveToDetailPage(product.id)"
+        >
+          <img 
+            class="product-image" 
+            :src="product.imageUrl" 
+            :alt="product.name" 
+          />
           <p>{{product.name}}</p>
           <span>{{product.price}}</span>
         </li>
@@ -17,25 +33,46 @@
 
 <script>
 import axios from 'axios';
+import SearchInput from '~/components/SearchInput.vue';
+import { fetchProductByKeyword } from '~/api';
 
 export default {
-  async asyncData() {
-    const response = await axios.get('http://localhost:3000/products')
-    console.log(response)
-    const products = response.data.map((item) => ({
-      ...item,
-      imageUrl : `${item.imageUrl}?random=${Math.random()}`
-    }))
-    return {products}
-  },
-  // data(){
-  //   return {
-  //     products: []
-  //   }
-  // },
-  // async created() {
-  // }
-
+    components: { SearchInput },
+    async asyncData() {
+        const response = await axios.get("http://localhost:3000/products");
+        const products = response.data.map((item) => ({
+            ...item,
+            imageUrl: `${item.imageUrl}?random=${Math.random()}`
+        }));
+        return { products };
+    },
+    data() {
+      return {
+        searchKeyword: '',
+      }
+    },
+    methods: {
+        moveToDetailPage(id) {
+            this.$router.push(`detail/${id}`);
+        },
+        // updateSearchKeyword(keyword){
+        //   this.searchKeyword = keyword
+        // }
+        async searchProducts(){
+          const response = await fetchProductByKeyword(this.searchKeyword);
+          this.products = response.data.map((item) => ({
+            ...item,
+            imageUrl: `${item.imageUrl}?random=${Math.random()}`
+          }));
+        }
+    },
+    // data(){
+    //   return {
+    //     products: []
+    //   }
+    // },
+    // async created() {
+    // }
 }
 </script>
 
