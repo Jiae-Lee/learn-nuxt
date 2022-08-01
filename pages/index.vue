@@ -27,6 +27,9 @@
           <span>{{product.price}}</span>
         </li>
       </ul>
+      <div class="cart-wrapper">
+        <button class="btn" @click="moeToCartPage">장바구니 바로가기</button>
+      </div>
     </main>
   </div>
 </template>
@@ -58,12 +61,15 @@ export default {
         // updateSearchKeyword(keyword){
         //   this.searchKeyword = keyword
         // }
-        async searchProducts(){
+        async searchProducts() {
           const response = await fetchProductByKeyword(this.searchKeyword);
           this.products = response.data.map((item) => ({
             ...item,
             imageUrl: `${item.imageUrl}?random=${Math.random()}`
           }));
+        },
+        moeToCartPage() {
+          this.$router.push('/cart')
         }
     },
     // data(){
